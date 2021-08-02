@@ -1,0 +1,22 @@
+on:
+  release:
+    types: [created]
+
+jobs:
+  releases-matrix:
+    name: Release Go Binary
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux]
+        goarch: ["386", "amd64", "arm", "arm64"]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: wangyoucao577/go-release-action@v1.19
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goversion: 1.16
+        project_path: ./cmd/add-ca-certificates
+        sha256sum: TRUE
+        goos: ${{ matrix.goos }}
+        goarch: ${{ matrix.goarch }}
