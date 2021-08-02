@@ -6,11 +6,12 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"syscall"
 )
 
 type Manager struct {
 	CertBundlePath string
-	LocalPath string
+	LocalPath      string
 
 	certs *certificateSet
 }
@@ -18,7 +19,7 @@ type Manager struct {
 func NewManager(certBundle, localPath string) *Manager {
 	manager := &Manager{
 		CertBundlePath: certBundle,
-		LocalPath: localPath,
+		LocalPath:      localPath,
 
 		certs: NewCertificateSet(),
 	}
@@ -27,7 +28,7 @@ func NewManager(certBundle, localPath string) *Manager {
 }
 
 func (m *Manager) BuildBundle() error {
-	sys := fileSystem{}
+	sys := &fileSystem{}
 	err := m.parseCertBundle(sys)
 	if err != nil {
 		return err
@@ -76,6 +77,11 @@ func (m *Manager) extractCertificates(data []byte) {
 func (m *Manager) parseCertBundle(sys fs.FS) error {
 	data, err := fs.ReadFile(sys, m.CertBundlePath)
 	if err != nil {
+		if ferr, ok := err.(*fs.PathError); ok && ferr.Err == syscall.Errno(2) {
+			return nil
+		} else if err == fs.ErrNotExist {
+			return nil
+		}
 		return err
 	}
 
@@ -87,6 +93,11 @@ func (m *Manager) parseCertBundle(sys fs.FS) error {
 func (m *Manager) parseLocalPath(sys fs.FS) error {
 	dirEntries, err := fs.ReadDir(sys, ".")
 	if err != nil {
+		if ferr, ok := err.(*fs.PathError); ok && ferr.Err == syscall.Errno(2) {
+			return nil
+		} else if err == fs.ErrNotExist {
+			return nil
+		}
 		return err
 	}
 

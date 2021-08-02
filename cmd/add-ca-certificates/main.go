@@ -2,8 +2,9 @@ package main
 
 import (
 	"log"
-	"magnax.ca/add-ca-certificates/pkg/cli"
 	"os"
+
+	"magnax.ca/add-ca-certificates/pkg/cli"
 )
 
 func main() {

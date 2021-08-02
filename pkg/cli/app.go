@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+
 	"github.com/urfave/cli/v2"
 	"magnax.ca/add-ca-certificates/pkg/management"
 )
@@ -16,7 +17,7 @@ func NewApp() *cli.App {
 	var localCertsPath string
 
 	app := &cli.App{
-		Name: "add-ca-certificates",
+		Name:  "add-ca-certificates",
 		Usage: "Add new certificates to the global ca-certificates file.",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -39,7 +40,7 @@ func NewApp() *cli.App {
 				return err
 			}
 			n, err := manager.WriteBundle()
-			fmt.Printf("Printed %d certificates to the bundle", n)
+			fmt.Printf("Printed %d certificates to the bundle\n", n)
 			return err
 		},
 	}
