@@ -1,19 +1,21 @@
-  on: [push, pull_request]
+name: CI Tests
 
-  jobs:
-    test:
-      name: Test Go Packages
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          goversion: ["1.16.x"]
-      steps:
-        - name: Checkout Code
-          uses: actions/checkout@v2
-        - name: Install Go
-          uses: actions/setup-go@v2
-          with:
-            go-version: ${{ matrix.goversion }}
-        - name: Run Tests
-          run: |
-            go test ./...
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test Go Packages
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goversion: ["1.16.x"]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.goversion }}
+      - name: Run Tests
+        run: |
+          go test ./...

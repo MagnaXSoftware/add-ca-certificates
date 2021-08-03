@@ -1,5 +1,7 @@
 # add-ca-certificates
 
+[![.github/workflows/test.yml](https://github.com/MagnaXSoftware/add-ca-certificates/actions/workflows/test.yml/badge.svg)](https://github.com/MagnaXSoftware/add-ca-certificates/actions/workflows/test.yml)
+
 `add-ca-certificates` updates the _ca-certificates.crt_ bundle, often located at _/etc/ssl/certs/ca-certificates.crt_ on linux distributions.
 
 Contrary to `update-ca-certificates`, which can remove CA certificates from the bundle, `add-ca-certificates` only ever **adds** new certificates to the bundle.
