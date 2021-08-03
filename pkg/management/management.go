@@ -57,6 +57,7 @@ func (m *Manager) extractCertificates(data []byte) {
 		if block == nil {
 			break
 		}
+		data = newData
 
 		if block.Type != "CERTIFICATE" {
 			continue
@@ -67,8 +68,6 @@ func (m *Manager) extractCertificates(data []byte) {
 			defer wg.Done()
 			m.certs.AddCertificate(p)
 		}(block)
-
-		data = newData
 	}
 
 	wg.Wait()

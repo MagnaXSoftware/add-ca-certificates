@@ -34,6 +34,23 @@ func NewCertificateSet() *certificateSet {
 	return &certificateSet{}
 }
 
+// Len calculates and returns the size of the certificate set.
+func (s *certificateSet) Len() (n int) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	for i := 0; i < mapSetSize; i++ {
+		if s.certMap[i] == nil {
+			continue
+		}
+		n += len(s.certMap[i])
+	}
+	return
+}
+
+// AddCertificate stores the given certificate block in the set.
+//
+// Because of set semantics, only one copy of a given certificate is stored.
 func (s *certificateSet) AddCertificate(block certificate) {
 	hash := hashCert(block)
 
