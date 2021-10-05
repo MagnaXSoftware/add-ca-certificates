@@ -14,7 +14,7 @@ const (
 
 func NewApp() *cli.App {
 	var certBundlePath string
-	var localCertsPath string
+	var localCertsPath = cli.NewStringSlice()
 
 	app := &cli.App{
 		Name:  "add-ca-certificates",
@@ -26,15 +26,15 @@ func NewApp() *cli.App {
 				Usage:       "Path to the certificate bundle",
 				Destination: &certBundlePath,
 			},
-			&cli.StringFlag{
+			&cli.StringSliceFlag{
 				Name:        "local-path",
-				Value:       LocalCertsPath,
-				Usage:       "Path to the local certificates folder. All certificates in this tree will be trusted.",
-				Destination: &localCertsPath,
+				Value:       cli.NewStringSlice(LocalCertsPath),
+				Usage:       "Path to the local certificates folder. All certificates in this tree will be trusted. Can be specified multiple times.",
+				Destination: localCertsPath,
 			},
 		},
 		Action: func(c *cli.Context) error {
-			manager := management.NewManager(certBundlePath, localCertsPath)
+			manager := management.NewManager(certBundlePath, localCertsPath.Value())
 			err := manager.BuildBundle()
 			if err != nil {
 				return err

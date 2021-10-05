@@ -11,15 +11,15 @@ import (
 
 type Manager struct {
 	CertBundlePath string
-	LocalPath      string
+	LocalPaths     []string
 
 	certs *certificateSet
 }
 
-func NewManager(certBundle, localPath string) *Manager {
+func NewManager(certBundle string, localPaths []string) *Manager {
 	manager := &Manager{
 		CertBundlePath: certBundle,
-		LocalPath:      localPath,
+		LocalPaths:     localPaths,
 
 		certs: NewCertificateSet(),
 	}
@@ -35,11 +35,16 @@ func (m *Manager) BuildBundle() error {
 	}
 
 	// We use the specific Sub implementation because the fs.Sub one rejects rooted paths, which we support.
-	sub, err := sys.Sub(m.LocalPath)
-	if err != nil {
-		return err
+	for _, localPath := range m.LocalPaths {
+		sub, err := sys.Sub(localPath)
+		if err != nil {
+			return err
+		}
+		if err = m.parseLocalPath(sub); err != nil {
+			return err
+		}
 	}
-	return m.parseLocalPath(sub)
+	return nil
 }
 
 func (m *Manager) WriteBundle() (int64, error) {
