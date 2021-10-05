@@ -13,4 +13,4 @@ This is an issue in many corporate environments, as the entreprise PKI should be
 
     add-ca-certificates [--bundle path-to-the-bundle] [--local-path path/to/the/locally/trusted/certificates]
 
-The first time that `add-ca-certificates` runs, it may re-order the certificates already present in the bundle, as the ordering used internally might not match with the previously used ordering.
+`add-ca-certificate` will now maintain the existing order of the cert bundle and insert the new certificates at the end, this will reduce the instability of the resulting cert bundle.
