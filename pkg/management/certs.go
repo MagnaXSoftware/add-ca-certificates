@@ -22,13 +22,18 @@ func hashCert(block certificate) uint8 {
 }
 
 type certificateSet struct {
-	certMap [mapSetSize]certificateList
+	certMap   [mapSetSize]certificateList
+	certOrder []certIdx
 
 	mutex sync.Mutex
 }
 
 type certificateList []certificate
 type certificate *pem.Block
+type certIdx struct {
+	hashCode uint8
+	idx      int
+}
 
 func NewCertificateSet() *certificateSet {
 	return &certificateSet{}
@@ -39,12 +44,7 @@ func (s *certificateSet) Len() (n int) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	for i := 0; i < mapSetSize; i++ {
-		if s.certMap[i] == nil {
-			continue
-		}
-		n += len(s.certMap[i])
-	}
+	n = len(s.certOrder)
 	return
 }
 
@@ -59,33 +59,28 @@ func (s *certificateSet) AddCertificate(block certificate) {
 
 	if s.certMap[hash] != nil {
 		for _, p := range s.certMap[hash] {
-			if bytes.Equal(p.Bytes, block.Bytes) {
+			if len(p.Bytes) == len(block.Bytes) && bytes.Equal(p.Bytes, block.Bytes) {
 				return
 			}
 		}
 	}
 	s.certMap[hash] = append(s.certMap[hash], block)
+	s.certOrder = append(s.certOrder, certIdx{hash, len(s.certMap[hash]) - 1})
 }
 
 func (s *certificateSet) WriteTo(w io.Writer) (n int64, err error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	for i := 0; i < mapSetSize; i++ {
-		if s.certMap[i] == nil {
-			continue
+	for _, idx := range s.certOrder {
+		err = pem.Encode(w, s.certMap[idx.hashCode][idx.idx])
+		if err != nil {
+			return
 		}
-
-		for j := 0; j < len(s.certMap[i]); j++ {
-			err = pem.Encode(w, s.certMap[i][j])
-			if err != nil {
-				return
-			}
-			n++
-			_, err = w.Write([]byte("\n"))
-			if err != nil {
-				return
-			}
+		n++
+		_, err = w.Write([]byte("\n"))
+		if err != nil {
+			return
 		}
 	}
 
