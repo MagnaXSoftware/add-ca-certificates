@@ -23,7 +23,7 @@ AAECAwQFBgc=
 `
 
 func TestManager_ExtractCertificates(t *testing.T) {
-	m := NewManager("", "")
+	m := NewManager("", []string{""})
 	data := []byte("")
 
 	m.extractCertificates(data)
